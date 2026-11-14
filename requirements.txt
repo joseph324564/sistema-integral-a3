@@ -1,0 +1,6 @@
+streamlit
+pandas
+pyotp
+qrcode
+psycopg2-binary
+Pillow
