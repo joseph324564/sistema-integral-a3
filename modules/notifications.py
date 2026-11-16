@@ -3,6 +3,18 @@ import pandas as pd
 from datetime import datetime
 from database.connection import get_connection
 
+def _parsear_fecha_ingreso(val):
+    if not val:
+        return None
+    val_str = str(val).strip()[:19]
+    try:
+        return datetime.strptime(val_str, "%Y-%m-%d %H:%M:%S")
+    except ValueError:
+        try:
+            return datetime.strptime(val_str[:10], "%Y-%m-%d")
+        except ValueError:
+            return None
+
 def mostrar_notificaciones():
     st.header("🔔 Centro de Control de Alertas Próximas a Vencer")
     st.write("Filtro de seguridad en tiempo real por operador logístico.")
@@ -23,7 +35,9 @@ def mostrar_notificaciones():
     vencidos = []
     
     for _, r in df.iterrows():
-        ing = datetime.strptime(r['fecha_ingreso'], "%Y-%m-%d %H:%M:%S")
+        ing = _parsear_fecha_ingreso(r['fecha_ingreso'])
+        if not ing:
+            continue
         transcurridos = (datetime.now() - ing).total_seconds() / 60
         pct = (transcurridos / r['vida_min']) * 100
         
